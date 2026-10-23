@@ -1,0 +1,81 @@
+import sqlite3
+
+# Conexión a la base de datos (si no existe, la crea)
+conexion = sqlite3.connect("guardia_bomberos.db")
+cursor = conexion.cursor()
+
+# Tabla Personal
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Personal (
+    id_personal INTEGER PRIMARY KEY AUTOINCREMENT,
+    dni TEXT NOT NULL UNIQUE,
+    nombre TEXT NOT NULL,
+    apellido TEXT NOT NULL,
+    rango TEXT NOT NULL,
+    telefono TEXT,
+    fecha_ingreso TEXT,
+    activo INTEGER DEFAULT 1
+)
+""")
+
+# Tabla Vehiculos
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Vehiculos (
+    id_vehiculo INTEGER PRIMARY KEY AUTOINCREMENT,
+    patente TEXT NOT NULL UNIQUE,
+    tipo TEXT NOT NULL,
+    estado TEXT DEFAULT 'Operativo'
+)
+""")
+
+# Tabla Guardias
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Guardias (
+    id_guardia INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha TEXT NOT NULL,
+    hora_inicio TEXT,
+    hora_fin TEXT
+)
+""")
+
+# Tabla intermedia Guardia_Personal (muchos a muchos)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Guardia_Personal (
+    id_guardia INTEGER NOT NULL,
+    id_personal INTEGER NOT NULL,
+    PRIMARY KEY (id_guardia, id_personal),
+    FOREIGN KEY (id_guardia) REFERENCES Guardias(id_guardia),
+    FOREIGN KEY (id_personal) REFERENCES Personal(id_personal)
+)
+""")
+
+# Tabla Novedades
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Novedades (
+    id_novedad INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_guardia INTEGER NOT NULL,
+    id_vehiculo INTEGER,
+    hora TEXT,
+    tipo_evento TEXT,
+    descripcion TEXT,
+    FOREIGN KEY (id_guardia) REFERENCES Guardias(id_guardia),
+    FOREIGN KEY (id_vehiculo) REFERENCES Vehiculos(id_vehiculo)
+)
+""")
+
+# Tabla Inventario
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS Inventario (
+    id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_vehiculo INTEGER,
+    nombre TEXT NOT NULL,
+    cantidad INTEGER DEFAULT 1,
+    estado TEXT DEFAULT 'Bueno',
+    FOREIGN KEY (id_vehiculo) REFERENCES Vehiculos(id_vehiculo)
+)
+""")
+
+conexion.commit()
+conexion.close()
+
+print("Base de datos creada correctamente: guardia_bomberos.db")
