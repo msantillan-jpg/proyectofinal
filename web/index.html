@@ -203,7 +203,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th><th>DNI</th><th>Nombre</th><th>Apellido</th>
-                                    <th>Rango</th><th>Teléfono</th><th>Fecha Ingreso</th>
+                                    <th>Rango</th><th>Teléfono</th><th>Fecha Ingreso</th><th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -234,6 +234,13 @@
 
                             <label>Fecha de Ingreso</label>
                             <input type="date" id="p-fecha">
+
+                            <label>Estado</label>
+                            <select id="p-estado">
+                                <option value="Activo">Activo</option>
+                                <option value="De licencia">De licencia</option>
+                                <option value="Baja">Baja</option>
+                            </select>
 
                             <div class="botones">
                                 <button type="submit" class="btn-principal">Guardar</button>

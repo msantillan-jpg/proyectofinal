@@ -1534,3 +1534,20 @@ label[for="filtro-estado-alerta"],
 #filtro-estado-alerta {
     display: none;
 }
+/* ================= Estado del personal ================= */
+.estado-activo {
+    background-color: var(--ok);
+}
+
+.estado-licencia {
+    background-color: #f5b800;
+    color: #3a2a00;
+}
+
+.estado-baja {
+    background-color: #6d6d6d;
+}
+
+table tbody tr.persona-baja td {
+    color: var(--texto-tenue);
+}

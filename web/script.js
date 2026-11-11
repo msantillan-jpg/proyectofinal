@@ -13,22 +13,39 @@ document.querySelectorAll(".tab-btn").forEach(boton => {
 const formPersonal = document.getElementById("form-personal");
 const tablaPersonalBody = document.querySelector("#tabla-personal tbody");
 
+function claseEstadoPersonal(estado) {
+    if (estado === "Activo") return "estado-activo";
+    if (estado === "De licencia") return "estado-licencia";
+    return "estado-baja";
+}
+
 async function cargarTablaPersonal() {
     const personal = await eel.js_listar_personal()();
     tablaPersonalBody.innerHTML = "";
 
     personal.forEach(persona => {
+        // persona = [id, dni, nombre, apellido, rango, telefono, fecha_ingreso, estado]
         const fila = document.createElement("tr");
         fila.dataset.id = persona[0];
-        fila.innerHTML = `
-            <td>${persona[0]}</td>
-            <td>${persona[1]}</td>
-            <td>${persona[2]}</td>
-            <td>${persona[3]}</td>
-            <td>${persona[4] || ""}</td>
-            <td>${persona[5] || ""}</td>
-            <td>${persona[6] || ""}</td>
-        `;
+        if (persona[7] === "Baja") fila.classList.add("persona-baja");
+
+        const valores = [
+            persona[0], persona[1], persona[2], persona[3],
+            persona[4] || "", persona[5] || "", persona[6] || ""
+        ];
+        valores.forEach(valor => {
+            const celda = document.createElement("td");
+            celda.textContent = valor;
+            fila.appendChild(celda);
+        });
+
+        const celdaEstado = document.createElement("td");
+        const etiqueta = document.createElement("span");
+        etiqueta.className = "etiqueta-estado " + claseEstadoPersonal(persona[7]);
+        etiqueta.textContent = persona[7];
+        celdaEstado.appendChild(etiqueta);
+        fila.appendChild(celdaEstado);
+
         fila.addEventListener("click", () => seleccionarPersonal(persona, fila));
         tablaPersonalBody.appendChild(fila);
     });
@@ -45,6 +62,7 @@ function seleccionarPersonal(persona, fila) {
     document.getElementById("p-rango").value = persona[4] || "";
     document.getElementById("p-telefono").value = persona[5] || "";
     document.getElementById("p-fecha").value = persona[6] || "";
+    document.getElementById("p-estado").value = persona[7];
 }
 
 function limpiarFormPersonal() {
@@ -53,17 +71,21 @@ function limpiarFormPersonal() {
     document.querySelectorAll("#tabla-personal tbody tr").forEach(f => f.classList.remove("seleccionada"));
 }
 
+function leerFormPersonal() {
+    return [
+        document.getElementById("p-dni").value,
+        document.getElementById("p-nombre").value,
+        document.getElementById("p-apellido").value,
+        document.getElementById("p-rango").value,
+        document.getElementById("p-telefono").value,
+        document.getElementById("p-fecha").value,
+        document.getElementById("p-estado").value
+    ];
+}
+
 formPersonal.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    const dni = document.getElementById("p-dni").value;
-    const nombre = document.getElementById("p-nombre").value;
-    const apellido = document.getElementById("p-apellido").value;
-    const rango = document.getElementById("p-rango").value;
-    const telefono = document.getElementById("p-telefono").value;
-    const fecha = document.getElementById("p-fecha").value;
-
-    await eel.js_alta_personal(dni, nombre, apellido, rango, telefono, fecha)();
+    await eel.js_alta_personal(...leerFormPersonal())();
     limpiarFormPersonal();
     cargarTablaPersonal();
 });
@@ -75,14 +97,7 @@ document.getElementById("btn-modificar-personal").addEventListener("click", asyn
         return;
     }
 
-    const dni = document.getElementById("p-dni").value;
-    const nombre = document.getElementById("p-nombre").value;
-    const apellido = document.getElementById("p-apellido").value;
-    const rango = document.getElementById("p-rango").value;
-    const telefono = document.getElementById("p-telefono").value;
-    const fecha = document.getElementById("p-fecha").value;
-
-    await eel.js_modificar_personal(id, dni, nombre, apellido, rango, telefono, fecha)();
+    await eel.js_modificar_personal(id, ...leerFormPersonal())();
     limpiarFormPersonal();
     cargarTablaPersonal();
 });
@@ -94,7 +109,7 @@ document.getElementById("btn-baja-personal").addEventListener("click", async () 
         return;
     }
 
-    if (confirm("¿Seguro que querés dar de baja a este bombero?")) {
+    if (confirm("¿Dar de baja a este bombero? No se borra: queda en el listado con estado Baja y conserva su historial de guardias.")) {
         await eel.js_baja_personal(id)();
         limpiarFormPersonal();
         cargarTablaPersonal();
@@ -103,7 +118,6 @@ document.getElementById("btn-baja-personal").addEventListener("click", async () 
 
 document.getElementById("btn-limpiar-personal").addEventListener("click", limpiarFormPersonal);
 
-// ---------- Carga inicial ----------
 cargarTablaPersonal();
 // ---------- VEHICULOS ----------
 // ---------- VEHICULOS ----------
