@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avisar una emergencia - Bomberos Voluntarios Concepción</title>
+    <link rel="icon" href="/logo.png">
+    <script src="/tema.js"></script>
+    <link rel="stylesheet" href="/estilo.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body class="pagina-publica">
+
+<header class="publico-cabecera">
+    <img src="/logo.png" alt="Escudo de Bomberos Voluntarios Concepción">
+    <div>
+        <strong>Bomberos Voluntarios</strong>
+        <span>Concepción - Tucumán</span>
+    </div>
+    <button type="button" class="btn-tema" id="btn-tema">
+        <span class="tema-icono">☀️</span>
+        <span class="tema-texto">Modo día</span>
+    </button>
+</header>
+
+<main class="publico-contenido">
+
+    <div class="aviso-llamar">
+        Si es una emergencia en curso, <strong>llamá al <a href="tel:425252">425252</a></strong>.
+        Este formulario es un canal complementario y no reemplaza la llamada.
+    </div>
+
+    <form id="form-emergencia" class="publico-form" novalidate>
+
+        <!-- ===== Paso 1: tipo ===== -->
+        <section class="paso">
+            <h2 class="paso-titulo"><span class="paso-numero">1</span> ¿Qué está pasando?</h2>
+
+            <div class="tipos">
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Incendio de vivienda o vehículo">
+                    <span>🔥 Incendio de vivienda o vehículo</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Incendio de pastizal o forestal">
+                    <span>🌾 Incendio de pastizal o forestal</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Accidente de tránsito">
+                    <span>🚗 Accidente de tránsito</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Rescate">
+                    <span>🆘 Rescate</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Pérdida de gas">
+                    <span>💨 Pérdida de gas</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Persona descompensada">
+                    <span>🚑 Persona descompensada</span>
+                </label>
+                <label class="tipo-opcion">
+                    <input type="radio" name="tipo" value="Otro">
+                    <span>❓ Otro</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- ===== Paso 2: lugar ===== -->
+        <section class="paso">
+            <h2 class="paso-titulo"><span class="paso-numero">2</span> ¿Dónde es?</h2>
+
+            <button type="button" id="btn-ubicacion" class="btn-principal btn-grande">📍 Usar mi ubicación actual</button>
+            <p class="ayuda-lugar" id="estado-ubicacion">O tocá el mapa para marcar el lugar.</p>
+
+            <div id="mapa-reporte" class="mapa"></div>
+
+            <label for="referencia">Referencia del lugar (opcional)</label>
+            <input type="text" id="referencia" maxlength="150" placeholder="Ej: frente a la plaza, esquina con la farmacia">
+        </section>
+
+        <!-- ===== Paso 3: más datos ===== -->
+        <section class="paso">
+            <h2 class="paso-titulo"><span class="paso-numero">3</span> Más datos (si los sabés)</h2>
+
+            <div class="grupo-chips">
+                <p>¿Hay personas heridas o afectadas?</p>
+                <div class="chips">
+                    <label class="chip"><input type="radio" name="victimas" value="No hay"><span>No hay</span></label>
+                    <label class="chip"><input type="radio" name="victimas" value="1"><span>1</span></label>
+                    <label class="chip"><input type="radio" name="victimas" value="2"><span>2</span></label>
+                    <label class="chip"><input type="radio" name="victimas" value="3 o más"><span>3 o más</span></label>
+                    <label class="chip"><input type="radio" name="victimas" value="No sé"><span>No sé</span></label>
+                </div>
+            </div>
+
+            <div class="grupo-chips" id="bloque-atrapados" hidden>
+                <p>¿Hay personas atrapadas o dentro?</p>
+                <div class="chips">
+                    <label class="chip"><input type="radio" name="atrapados" value="Sí"><span>Sí</span></label>
+                    <label class="chip"><input type="radio" name="atrapados" value="No"><span>No</span></label>
+                    <label class="chip"><input type="radio" name="atrapados" value="No sé"><span>No sé</span></label>
+                </div>
+            </div>
+
+            <div id="bloque-vehiculos" hidden>
+                <div class="grupo-chips">
+                    <p>¿Cuántos vehículos están involucrados?</p>
+                    <div class="chips">
+                        <label class="chip"><input type="radio" name="cantidad_vehiculos" value="1"><span>1</span></label>
+                        <label class="chip"><input type="radio" name="cantidad_vehiculos" value="2"><span>2</span></label>
+                        <label class="chip"><input type="radio" name="cantidad_vehiculos" value="3 o más"><span>3 o más</span></label>
+                    </div>
+                </div>
+
+                <div class="grupo-chips">
+                    <p>¿Qué tipo de vehículos? (podés marcar varios)</p>
+                    <div class="chips">
+                        <label class="chip"><input type="checkbox" name="tipos_vehiculos" value="Auto"><span>Auto</span></label>
+                        <label class="chip"><input type="checkbox" name="tipos_vehiculos" value="Moto"><span>Moto</span></label>
+                        <label class="chip"><input type="checkbox" name="tipos_vehiculos" value="Camión o colectivo"><span>Camión o colectivo</span></label>
+                        <label class="chip"><input type="checkbox" name="tipos_vehiculos" value="Bicicleta"><span>Bicicleta</span></label>
+                        <label class="chip"><input type="checkbox" name="tipos_vehiculos" value="Peatón"><span>Peatón</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <label for="nota">Algo más que quieras contarnos (opcional)</label>
+            <textarea id="nota" rows="3" maxlength="300" placeholder="Ej: hay mucho humo, el portón es verde"></textarea>
+        </section>
+
+        <!-- ===== Paso 4: contacto ===== -->
+        <section class="paso">
+            <h2 class="paso-titulo"><span class="paso-numero">4</span> ¿Cómo te llamamos?</h2>
+
+            <label for="telefono">Teléfono de contacto</label>
+            <input type="tel" id="telefono" inputmode="tel" maxlength="25" autocomplete="tel" placeholder="Ej: 3865 123456">
+
+            <label for="nombre">Tu nombre (opcional)</label>
+            <input type="text" id="nombre" maxlength="80" autocomplete="name">
+
+            <p class="privacidad">Tus datos se usan solamente para que la guardia pueda comunicarse con vos.</p>
+
+            <!-- Campo trampa: las personas no lo ven -->
+            <div class="trampa" aria-hidden="true">
+                <label for="sitio_web">Sitio web</label>
+                <input type="text" id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
+            </div>
+        </section>
+
+        <p class="mensaje-error" id="mensaje-error" role="alert"></p>
+
+        <button type="submit" id="btn-enviar" class="btn-principal btn-grande">Enviar aviso</button>
+    </form>
+
+    <!-- ===== Confirmación ===== -->
+    <section class="exito" id="exito" hidden>
+        <h2>✅ Tu aviso llegó a la guardia</h2>
+        <p id="texto-numero"></p>
+        <p>Nos vamos a comunicar con vos para confirmar los datos.</p>
+        <p class="aviso-exito">Si la situación empeora o es una emergencia en curso, <strong>llamá al <a href="tel:425252">425252</a></strong>.</p>
+        <button type="button" id="btn-otro" class="btn-principal">Enviar otro aviso</button>
+    </section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/reportar.js"></script>
+</body>
+</html>

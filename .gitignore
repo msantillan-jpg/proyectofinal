@@ -1,0 +1,17 @@
+# Datos reales y claves: nunca se suben
+guardia_bomberos.db
+*.db
+clave_secreta.txt
+
+# Fotos de personas (se entregan solo con sesión iniciada)
+web/privado-*
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Archivos del sistema y del editor
+.vscode/
+Thumbs.db

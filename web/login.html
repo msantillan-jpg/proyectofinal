@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ingreso - Sistema de Guardia</title>
+    <link rel="icon" href="/logo.png">
+    <script src="tema.js"></script>
+    <link rel="stylesheet" href="estilo.css">
+    <style>
+        body {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.85)), url('/fondo-login.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        [data-tema="dia"] body {
+            background-image: linear-gradient(rgba(255, 245, 240, 0.7), rgba(255, 245, 240, 0.9)), url('/fondo-login.jpg');
+        }
+
+        .login-tema {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+        }
+
+        .caja {
+            background-color: var(--panel);
+            border: 1px solid var(--borde);
+            border-top: 4px solid var(--naranja);
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 4px 20px var(--sombra);
+        }
+
+        .logo {
+            display: block;
+            height: 110px;
+            width: auto;
+            margin: 0 auto 15px auto;
+            background: #fff;
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .caja h1 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 5px;
+            color: var(--texto);
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: var(--texto-suave);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .login-boton {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            font-size: 15px;
+        }
+
+        #mensaje {
+            margin-top: 14px;
+            color: var(--error);
+            font-size: 13px;
+            text-align: center;
+            min-height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <button type="button" class="btn-tema login-tema" id="btn-tema">
+        <span class="tema-icono">☀️</span>
+        <span class="tema-texto">Modo día</span>
+    </button>
+
+    <div class="caja">
+        <img class="logo" src="/logo.png" alt="Escudo del cuerpo de bomberos">
+        <h1>Sistema de Guardia</h1>
+        <p class="subtitulo">Bomberos Voluntarios Concepción - Tucumán</p>
+
+        <form id="form-login">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" autocomplete="username" required autofocus>
+
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" autocomplete="current-password" required>
+
+            <button type="submit" class="btn-principal login-boton">Ingresar</button>
+            <p id="mensaje"></p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("form-login").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const mensaje = document.getElementById("mensaje");
+            mensaje.textContent = "";
+
+            const respuesta = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    usuario: document.getElementById("usuario").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            if (respuesta.ok) {
+                window.location.href = "/";
+            } else {
+                const error = await respuesta.json().catch(() => ({}));
+                mensaje.textContent = error.detail || "No se pudo iniciar sesión";
+            }
+        });
+    </script>
+</body>
+</html>
